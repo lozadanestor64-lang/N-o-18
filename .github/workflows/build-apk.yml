@@ -1,0 +1,42 @@
+
+name: Build NO18 APK
+
+on:
+  push:
+    paths:
+      - 'NO18-prototipo-fuente.zip'
+      - '.github/workflows/build-apk.yml'
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Extract project
+        run: |
+          unzip NO18-prototipo-fuente.zip
+          mv no18_project project
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Build APK
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
+
+      - name: Compile
+        run: |
+          cd project
+          gradle assembleDebug
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: NO18-APK
+          path: project/app/build/outputs/apk/debug/app-debug.apk
